@@ -45,7 +45,14 @@
 
 ### Testing with CI/CD
 
+* **Continuous Integration (CI)**: is a development practice that require developers to integrate code into a shared repository several times a day. Each check-in is then verified by an automated build, allowing teams to detect problems early.
+  * **Tools**:
+      * **Slef-Hosted**: Jenkins, Bamboo, TeamCity, Hudson
+      * **Cloud Based**: CircleCI, TravisCI, Codeship, GitLab CI, AWS CodeBuild
 
+* **Continuous Development (CD)**: 
+
+* **Continuous Delivery (CD)**: 
 
 ### Test Driven Development
 
