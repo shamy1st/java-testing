@@ -66,3 +66,19 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
   2. make it Run
   3. make it Right
 
+### Spring Boot
+
+* **Dependencies**
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
+
+
+
+
+
