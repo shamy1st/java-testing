@@ -86,10 +86,12 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
                 RequestBuilder request = MockMvcRequestBuilders
                         .get("/hello")
                         .accept(MediaType.APPLICATION_JSON);
-                MvcResult result = mockMvc.perform(request).andReturn();
-                String response = result.getResponse().getContentAsString();
-
-                assertEquals("Hello Testing!", response);
+                MvcResult result = mockMvc.perform(request)
+                        .andExpect(status().isOk())
+                        .andExpect(content().string("Hello Testing!"))
+                        .andReturn();
+                //String response = result.getResponse().getContentAsString();
+                //assertEquals("Hello Testing!", response);
             }
         }
 
@@ -102,9 +104,41 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
             }
         }
 
-###
+### Test ItemController
 
+        @ExtendWith(MockitoExtension.class)
+        @WebMvcTest(ItemController.class)
+        class ItemControllerTest {
 
+            @Autowired
+            private MockMvc mockMvc;
+
+            @Test
+            void getItem() throws Exception {
+                RequestBuilder request = MockMvcRequestBuilders
+                        .get("/item")
+                        .accept(MediaType.APPLICATION_JSON);
+
+                MvcResult result = mockMvc.perform(request)
+                        .andExpect(status().isOk())
+                        .andReturn();
+
+                String expectedJSON = new Item(1, "Ball", 10.5f, 100).toJSON();
+                String actualJSON = result.getResponse().getContentAsString();
+                JSONAssert.assertEquals(expectedJSON, actualJSON, false);
+            }
+        }
+
+        @RestController
+        public class ItemController {
+
+            @GetMapping("/item")
+            public Item getItem() {
+                return new Item(1, "Ball", 10.5f, 100);
+            }
+        }
+
+### 
 
 
 
