@@ -1,5 +1,7 @@
 # Java Testing
 
+## Overview
+
 ### Why?
 * improve quality
 * prove that the code do what you think
@@ -66,17 +68,41 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
   2. make it Run
   3. make it Right
 
-### Spring Boot
 
-* **Dependencies**
+## Spring Boot
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
+### Test HelloController
 
+        //@RunWith(SpringRunner.class)      //JUnit4
+        @ExtendWith(MockitoExtension.class) //JUnit5
+        @WebMvcTest(HelloController.class)
+        class HelloControllerTest {
 
+            @Autowired
+            private MockMvc mockMvc;
+
+            @Test
+            public void hello() throws Exception {
+                RequestBuilder request = MockMvcRequestBuilders
+                        .get("/hello")
+                        .accept(MediaType.APPLICATION_JSON);
+                MvcResult result = mockMvc.perform(request).andReturn();
+                String response = result.getResponse().getContentAsString();
+
+                assertEquals("Hello Testing!", response);
+            }
+        }
+
+        @RestController
+        public class HelloController {
+
+            @GetMapping("/hello")
+            public String hello() {
+                return "Hello Testing!";
+            }
+        }
+
+###
 
 
 
