@@ -189,7 +189,7 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
             }
         }
 
-### Integration Test
+### Integration Test using @SpringBootTest (in memory database h2)
 
         @ExtendWith(MockitoExtension.class)
         @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -210,6 +210,36 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
             }
         }
 
+### Integration Test using MockBean
 
+        @ExtendWith(MockitoExtension.class)
+        @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+        class ItemControllerIT {
+
+            @Autowired
+            private TestRestTemplate restTemplate;
+
+            @MockBean
+            private ItemRepository repository;
+
+            @Test
+            public void getItems() throws JSONException {
+                List<Item> list = new ArrayList<>();
+                list.add(new Item(10001, "item1", 10.5f, 20));
+                list.add(new Item(10002, "item2", 14.6f, 100));
+                list.add(new Item(10003, "item3", 6.4f, 150));
+                when(repository.findAll()).thenReturn(list);
+
+                String response = this.restTemplate.getForObject("/items-list", String.class);
+
+                String expected = "[{id:10001,name:item1,price:10.5,quantity:20}" +
+                        ",{id:10002,name:item2,price:14.6,quantity:100}" +
+                        ",{id:10003,name:item3,price:6.4,quantity:150}]";
+
+                JSONAssert.assertEquals(expected, response, false);
+            }
+        }
+
+###
 
 
