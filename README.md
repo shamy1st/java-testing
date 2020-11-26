@@ -71,74 +71,145 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
 
 ## Spring Boot
 
-### Test HelloController
-
-        //@RunWith(SpringRunner.class)      //JUnit4
-        @ExtendWith(MockitoExtension.class) //JUnit5
-        @WebMvcTest(HelloController.class)
-        class HelloControllerTest {
-
-            @Autowired
-            private MockMvc mockMvc;
-
-            @Test
-            public void hello() throws Exception {
-                RequestBuilder request = MockMvcRequestBuilders
-                        .get("/hello")
-                        .accept(MediaType.APPLICATION_JSON);
-                MvcResult result = mockMvc.perform(request)
-                        .andExpect(status().isOk())
-                        .andExpect(content().string("Hello Testing!"))
-                        .andReturn();
-                //String response = result.getResponse().getContentAsString();
-                //assertEquals("Hello Testing!", response);
-            }
-        }
+### Controller Unit Test
 
         @RestController
-        public class HelloController {
+        public class ItemController {
 
-            @GetMapping("/hello")
-            public String hello() {
-                return "Hello Testing!";
+            @Autowired
+            private ItemService service;
+
+            @GetMapping("/items-list")
+            public List<Item> getItems() {
+                return service.getItems();
             }
         }
-
-### Test ItemController
 
         @ExtendWith(MockitoExtension.class)
         @WebMvcTest(ItemController.class)
         class ItemControllerTest {
 
+            @MockBean
+            private ItemService service;
+
             @Autowired
             private MockMvc mockMvc;
 
-            @Test
-            void getItem() throws Exception {
+            void test(List<Item> list, String expected) throws Exception {
+                when(service.getItems()).thenReturn(list);
+
                 RequestBuilder request = MockMvcRequestBuilders
-                        .get("/item")
+                        .get("/items-list")
                         .accept(MediaType.APPLICATION_JSON);
 
                 MvcResult result = mockMvc.perform(request)
                         .andExpect(status().isOk())
+                        .andExpect(content().json(expected))
                         .andReturn();
+            }
 
-                String expectedJSON = new Item(1, "Ball", 10.5f, 100).toJSON();
-                String actualJSON = result.getResponse().getContentAsString();
-                JSONAssert.assertEquals(expectedJSON, actualJSON, false);
+            @Test
+            void getItems() throws Exception {
+                List<Item> list = new ArrayList<>();
+                list.add(new Item(10001, "item1", 10.5f, 20));
+                list.add(new Item(10002, "item2", 14.6f, 100));
+                list.add(new Item(10003, "item3", 6.4f, 150));
+
+                String expected = "[{id:10001,name:item1,price:10.5,quantity:20}" +
+                        ",{id:10002,name:item2,price:14.6,quantity:100}" +
+                        ",{id:10003,name:item3,price:6.4,quantity:150}]";
+
+                test(list, expected);
             }
         }
 
-        @RestController
-        public class ItemController {
+### Service Unit Test
 
-            @GetMapping("/item")
-            public Item getItem() {
-                return new Item(1, "Ball", 10.5f, 100);
+        @Service
+        public class ItemService {
+
+            @Autowired
+            private ItemRepository repository;
+
+            public List<Item> getItems() {
+                return repository.findAll();
             }
         }
 
-### 
+        @ExtendWith(MockitoExtension.class)
+        class ItemServiceTest {
+
+            @InjectMocks
+            private ItemService service;
+
+            @Mock
+            private ItemRepository repository;
+
+            void test(List<Item> list) throws Exception {
+                when(repository.findAll()).thenReturn(list);
+                List<Item> actualList = service.getItems();
+                assertEquals(actualList, list);
+            }
+
+            @Test
+            void getItems() throws Exception {
+                List<Item> list = new ArrayList<>();
+                list.add(new Item(10001, "item1", 10.5f, 20));
+                list.add(new Item(10002, "item2", 14.6f, 100));
+                list.add(new Item(10003, "item3", 6.4f, 150));
+                test(list);
+            }
+        }
+
+### Repository Unit Test
+
+        public interface ItemRepository extends JpaRepository<Item, Integer> {
+
+        }
+
+        @ExtendWith(MockitoExtension.class)
+        @DataJpaTest
+        class ItemRepositoryTest {
+
+            @Autowired
+            private ItemRepository repository;
+
+            void test(List<Item> list) {
+                List<Item> actualList = repository.findAll();
+                assertEquals(list, actualList);
+            }
+
+            @Test
+            public void findAll() {
+                List<Item> list = new ArrayList<>();
+                list.add(new Item(10001, "item1", 10.5f, 20));
+                list.add(new Item(10002, "item2", 14.6f, 100));
+                list.add(new Item(10003, "item3", 6.4f, 150));
+                test(list);
+            }
+        }
+
+### Integration Test
+
+        @ExtendWith(MockitoExtension.class)
+        @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+        class ItemControllerIT {
+
+            @Autowired
+            private TestRestTemplate restTemplate;
+
+            @Test
+            public void getItems() throws JSONException {
+                String response = this.restTemplate.getForObject("/items-list", String.class);
+
+                String expected = "[{id:10001,name:item1,price:10.5,quantity:20}" +
+                        ",{id:10002,name:item2,price:14.6,quantity:100}" +
+                        ",{id:10003,name:item3,price:6.4,quantity:150}]";
+
+                JSONAssert.assertEquals(expected, response, false);
+            }
+        }
+
 
 
 
