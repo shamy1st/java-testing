@@ -297,10 +297,37 @@ under **src/test/** create **test-configuration.properties** then:
             }
         }
 
-### 
+### JSONPath
 
+        import static org.assertj.core.api.Assertions.assertThat;
 
+        public class JsonPathTest {
 
+            @Test
+            public void test() {
+                String response = "[{id:10001,name:item1,price:10.5,quantity:20}" +
+                        ",{id:10002,name:item2,price:14.6,quantity:100}" +
+                        ",{id:10003,name:item3,price:6.4,quantity:150}]";
 
+                DocumentContext context = JsonPath.parse(response);
 
+                int length = context.read("$.length()");
+                assertThat(length).isEqualTo(3);
 
+                List<Integer> ids = context.read("$..id");
+                assertThat(ids).containsExactly(10001, 10002, 10003);
+
+                System.out.println(context.read("$.[1]").toString());
+                System.out.println(context.read("$.[0:2]").toString());
+                System.out.println(context.read("$.[?(@.name=='item3')]").toString());
+                System.out.println(context.read("$.[?(@.quantity==100)]").toString());
+            }
+        }
+
+### xUnit Patterns
+
+http://xunitpatterns.com/
+
+### Test Coverage
+
+Run 'All Tests' with Coverage, this show the coverage reports of your code in percentage and also source code which is covered and which is not.
