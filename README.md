@@ -256,4 +256,51 @@ under **src/test/** create **test-configuration.properties** then:
             
         }
 
+### Hamcrest
+
+        import static org.hamcrest.MatcherAssert.assertThat;
+        import static org.hamcrest.Matchers.*;
+        
+        public class HamcrestTest {
+
+            @Test
+            public void test() {
+                List<Integer> list = Arrays.asList(10, 20, 30);
+                assertThat(list, hasSize(3));
+                assertThat(list, hasItems(10, 20));
+                assertThat(list, everyItem(greaterThan(8)));
+                assertThat(list, everyItem(lessThan(40)));
+
+                assertThat("ABCDE", containsString("BCD"));
+                assertThat("ABCDE", startsWith("ABC"));
+                assertThat("ABCDE", endsWith("CDE"));
+            }
+        }
+
+### AssertJ
+
+        import static org.assertj.core.api.Assertions.assertThat;
+
+        public class AssertJTest {
+
+            @Test
+            public void test() {
+                List<Integer> list = Arrays.asList(10, 20, 30);
+
+                assertThat(list).hasSize(3)
+                                .contains(10, 20)
+                                .allMatch(item -> (item > 8) && (item < 40));
+
+                assertThat("ABCDE").contains("BCD")
+                                   .startsWith("ABC")
+                                   .endsWith("CDE");
+            }
+        }
+
 ### 
+
+
+
+
+
+
