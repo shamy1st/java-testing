@@ -240,6 +240,20 @@ Book: "Test-Driven Development by Examply- Kent Beck" 2002
             }
         }
 
-###
+### application.properties for testing
 
+1. for different properties while running tests, create **resources** directory under **src/test/**
+2. then copy the **application.properties** to it, and modify it as you want.
 
+### application.properties for a specific test
+
+under **src/test/** create **test-configuration.properties** then:
+
+        @ExtendWith(MockitoExtension.class)
+        @SpringBootTest
+        @TestPropertySource(locations = {"classpath:test-configuration.properties"})
+        class ItemControllerIT {
+            
+        }
+
+### 
